@@ -2,6 +2,10 @@ from fastapi import FastAPI
 
 app = FastAPI()
 
+@app.get("/")
+def root():
+    return {"message": "Hello from Service B"}
+
 @app.get("/info")
-def get_info():
-    return {"service": "B", "message": "Hello from Service B!", "status": "success"}
+def info():
+    return {"service": "B", "status": "OK"}
