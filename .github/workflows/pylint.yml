@@ -1,35 +1,38 @@
 name: Pylint
 
 on:
-  pull_request:
-    branches:
-    - dev
+  pull_request:
+    branches:
+      - dev
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.11"]
-    steps:
-      - uses: actions/checkout@v3
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11"]
 
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
-        with:
-          python-version: ${{ matrix.python-version }}
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pylint
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
 
-      - name: Analysing the code with pylint
-        run: |
-          pylint $(git ls-files '*.py') --output=lint.txt || true
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pylint
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: lint.txt
-          path: lint.txt
+      - name: Analyse code with Pylint
+        run: |
+          # Запускаем pylint по всем *.py в репозитории
+          # Вывод пишем в lint.txt; даже при ошибках линтера шаг не падает
+          pylint $(git ls-files '*.py') | tee lint.txt || true
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint.txt
+          path: lint.txt
